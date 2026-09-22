@@ -141,14 +141,28 @@ PROMPT_TEMPLATE = """你是一个严谨的问答助手。请仅依据下面的�
 回答:"""
 
 
-def answer_question(llm, question: str, results: list[SearchResult]) -> Answer:
+def answer_question(
+    llm,
+    question: str,
+    results: list[SearchResult],
+    max_context_chars: int = 4000,
+    stream_cb=None,
+) -> Answer:
     """问答主入口:组装 Prompt → 生成 → 返回带引用的回答。
 
     引用标注:要求模型在论断句尾标 [1][2],编号对应资料序号 —— 可溯源是 RAG 的灵魂。
     llm 参数接受任何实现 complete 的对象 —— 测试可注入假 LLM。
+    max_context_chars 交给 build_context 做超长裁剪;传 stream_cb(如 print)时
+    改走流式:每段增量回调一次,返回值仍是拼接后的全文。
     """
     if not results:  # 空检索如实告知,不硬编
         return Answer(text="知识库中没有相关内容,无法回答这个问题。", used_chunks=[])
-    context = build_context(results)
+    context = build_context(results, max_context_chars)
     prompt = PROMPT_TEMPLATE.format(context=context, question=question)
+    if stream_cb is not None:
+        parts: list[str] = []
+        for delta in llm.stream(prompt):
+            parts.append(delta)
+            stream_cb(delta)
+        return Answer(text="".join(parts), used_chunks=list(results))
     return Answer(text=llm.complete(prompt), used_chunks=list(results))

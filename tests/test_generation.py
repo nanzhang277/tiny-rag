@@ -2,7 +2,7 @@
 import httpx
 import pytest
 
-from fakes import FakeResponse
+from fakes import FakeLLM, FakeResponse
 from rag.chunking import Chunk
 from rag.config import Config
 from rag.generation import (
@@ -51,16 +51,39 @@ def test_answer_question_empty_results():
 def test_answer_question_passes_context_to_llm():
     captured = {}
 
-    class FakeLLM:
+    class FakeCompleteLLM:
         def complete(self, prompt):
             captured["prompt"] = prompt
             return "依据资料[1]的回答"
 
-    ans = answer_question(FakeLLM(), "什么是RAG", [_rs("证据内容", 1.0)])
+    ans = answer_question(FakeCompleteLLM(), "什么是RAG", [_rs("证据内容", 1.0)])
     assert "证据内容" in captured["prompt"]
     assert "什么是RAG" in captured["prompt"]
     assert ans.text == "依据资料[1]的回答"
     assert ans.used_chunks[0].chunk.text == "证据内容"
+
+
+def test_answer_question_streams_deltas_and_returns_full_text():
+    deltas: list[str] = []
+    ans = answer_question(FakeLLM(), "什么是RAG", [_rs("证据内容", 1.0)], stream_cb=deltas.append)
+    assert deltas == ["依据资料[1]", "得出的回答。"]  # 流式回调逐段发生
+    assert ans.text == "依据资料[1]得出的回答。"  # 返回值仍是拼接后的完整回答
+    assert ans.used_chunks[0].chunk.text == "证据内容"
+
+
+def test_answer_question_honors_max_context_chars():
+    captured = {}
+
+    class FakeCaptureLLM:
+        def complete(self, prompt):
+            captured["prompt"] = prompt
+            return "回答"
+
+    results = [_rs("长" * 60, 0.9), _rs("短证据", 0.5)]
+    answer_question(FakeCaptureLLM(), "问题", results, max_context_chars=80)
+    # 组装超限 → 从尾部(得分最低)开始丢 → "短证据"不该进 Prompt
+    assert "短证据" not in captured["prompt"]
+    assert "长" * 60 in captured["prompt"]
 
 
 def test_complete_retries_on_network_error(monkeypatch):
