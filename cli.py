@@ -1,9 +1,10 @@
-"""CLI 入口:ingest / ask 两个子命令(eval 在评测模块就绪后由下一任务接入)。
+"""CLI 入口:ingest / ask / eval 三个子命令。
 
 用法:
     export ZHIPUAI_API_KEY=<你的智谱 key>
     python cli.py ingest data/docs     # 建库(文件或目录)
     python cli.py ask "什么是RAG?"     # 问答,流式输出
+    python cli.py eval                 # 跑评测:检索指标对比表 + GLM 自评
     python cli.py --verbose ask "..."  # 打开 DEBUG 日志
 """
 from __future__ import annotations
@@ -29,6 +30,8 @@ def main(argv: list[str] | None = None) -> int:
     p_ask.add_argument("question", help="你的问题")
     p_ask.add_argument("--no-stream", action="store_true", help="关闭流式,等完整回答后一次打印")
 
+    sub.add_parser("eval", help="跑评测:recall@k / MRR 对比表 + GLM 自评")
+
     args = parser.parse_args(argv)
     cfg = Config.load(args.config)
     setup_logging(args.verbose)
@@ -43,6 +46,9 @@ def main(argv: list[str] | None = None) -> int:
             print()  # 流式结束后补一个换行
             if args.no_stream:
                 print(answer.text)
+        elif args.command == "eval":
+            from rag.evaluation import run_eval  # 延迟导入:ask/ingest 不背评测的依赖
+            print(run_eval(cfg))
     except (MissingAPIKeyError, APIError, FileNotFoundError, ValueError) as exc:
         print(f"错误: {exc}", file=sys.stderr)
         return 1

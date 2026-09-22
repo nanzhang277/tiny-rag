@@ -1,0 +1,32 @@
+[
+  {
+    "question": "RAG 是什么的缩写?指的是什么技术?",
+    "answer": "RAG 是 Retrieval-Augmented Generation(检索增强生成),把外部知识检索与大模型生成结合起来。",
+    "source": "data/docs/what_is_rag.md"
+  },
+  {
+    "question": "RAG 解决了哪两个核心问题?",
+    "answer": "知识停留在训练截止时间、模型幻觉。",
+    "source": "data/docs/what_is_rag.md"
+  },
+  {
+    "question": "RAG 流水线包含哪些环节?",
+    "answer": "文档加载、切块、向量化、检索、重排、生成、评测。",
+    "source": "data/docs/rag_pipeline.md"
+  },
+  {
+    "question": "为什么说检索不等于排序?",
+    "answer": "初筛快而糙,重排用更重的模型对候选成对精排。",
+    "source": "data/docs/rag_pipeline.md"
+  },
+  {
+    "question": "tiny-rag 的向量检索内核是怎么实现的?",
+    "answer": "numpy 手写:向量归一化后矩阵乘法即余弦相似度,取前 k 名。",
+    "source": "data/docs/tiny_rag_design.md"
+  },
+  {
+    "question": "tiny-rag 为什么不引入 LangChain 等重型框架?",
+    "answer": "学习版原则:自己组织实现以看清本质,模型服务用智谱 GLM 一个 key 全包。",
+    "source": "data/docs/tiny_rag_design.md"
+  }
+]
