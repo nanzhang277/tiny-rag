@@ -1,0 +1,38 @@
+# tiny-rag 默认配置。所有可调参数集中在这里：换模型/调参数 = 改这里，不改代码。
+# 密钥不走这里 —— API key 只从环境变量 ZHIPUAI_API_KEY 读取（密钥安全底线）。
+llm:
+  model: glm-4-flash        # 优先便宜型号跑通功能，可随时换
+  temperature: 0.1
+  max_output_tokens: 1024
+  max_context_chars: 4000   # 组装进 Prompt 的资料区最大字符数
+
+embedding:
+  model: embedding-3
+  batch_size: 16            # 批量大小：一次请求带多少条文本
+  dimensions: 1024
+
+rerank:
+  provider: zhipu           # zhipu = 智谱 rerank API；llm = LLM 打分降级方案
+  model: glm-rerank
+  top_n: 5
+
+retrieval:
+  vector_top_k: 10
+  bm25_top_k: 10
+  rrf_k: 60                 # RRF 融合的平滑常数，论文经验值
+
+chunking:
+  strategy: recursive       # fixed | recursive
+  size: 500                 # 每块目标字符数
+  overlap: 50               # 相邻块重叠字符数
+
+rerank_enabled: true
+
+paths:
+  vectors_file: data/vectors.npz
+  meta_file: data/meta.jsonl
+
+api:
+  base_url: https://open.bigmodel.cn/api/paas/v4
+  timeout_seconds: 60
+  max_retries: 3
