@@ -1,6 +1,6 @@
 /**
- * 应用装配（§域1 范围）：状态 + 渲染 + rAF 动画 + FIFO 输入队列 + 按钮面板。
- * 打乱/求解/计时按钮为本期禁用占位，由后续域（S2/S3）接入。
+ * 应用装配：状态 + 渲染 + rAF 动画 + FIFO 输入队列 + 按钮面板 + 计时（§D5）。
+ * 打乱/求解按钮仍为禁用占位，由后续域（QIQ-27/QIQ-28）接入。
  */
 (function (global) {
   'use strict';
@@ -53,11 +53,49 @@
     viewEl.style.transform = DEFAULT_VIEW;
   }
 
+  // ---------- 计时（§D5）：时间戳差值 + now() 注入，running 期间 rAF 仅刷新显示 ----------
+  const timer = Rubik.createTimer({ now: function () {
+    return Date.now();
+  } });
+
+  // 开始/停止同一按钮：armed → start，running → stop；其余状态由状态机忽略
+  function toggleTimer() {
+    if (timer.getState() === 'running') {
+      timer.stop();
+    } else {
+      timer.start();
+    }
+  }
+
   Rubik.buildButtonPanel(global.document.querySelector('.panel'), {
     onMove: function (move) {
       queue.enqueue(move);
     },
     onReset: resetCube,
     onResetView: resetView,
+    onTimer: toggleTimer,
+  });
+
+  const timerDisplay = global.document.querySelector('.timer-display');
+  let displayRaf = 0; // running 期间的实时刷新循环句柄
+
+  function stopDisplayLoop() {
+    if (displayRaf) {
+      global.cancelAnimationFrame(displayRaf);
+      displayRaf = 0;
+    }
+  }
+
+  timer.subscribe(function (state) {
+    timerDisplay.textContent = Rubik.formatTime(timer.getElapsed());
+    if (state === 'running') {
+      const loop = function () {
+        timerDisplay.textContent = Rubik.formatTime(timer.getElapsed());
+        displayRaf = global.requestAnimationFrame(loop);
+      };
+      displayRaf = global.requestAnimationFrame(loop);
+    } else {
+      stopDisplayLoop();
+    }
   });
 })(typeof window !== 'undefined' ? window : globalThis);

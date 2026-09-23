@@ -64,7 +64,8 @@
 
   /**
    * 构建按钮面板。callbacks: { onMove(move), onReset(), onResetView(),
-   * onScramble?, onSolve?, onTimer? } —— 打乱/求解/计时为本期禁用占位（§域1 范围）。
+   * onTimer? } —— 计时开始/停止已接入（§D5）；打乱/求解仍为禁用占位（域2/域4 接入）。
+   * 面板内含 .timer-display 成绩展示元素（m:ss.cs）。
    */
   function buildButtonPanel(container, callbacks) {
     const doc = global.document;
@@ -99,6 +100,9 @@
 
     // 功能区
     const actions = el('div', 'btn-actions');
+    // 计时成绩展示（m:ss.cs，§D5）：stopped 后保留成绩，由 app.js 订阅刷新
+    const timerDisplay = el('div', 'timer-display', '0:00.00');
+    actions.appendChild(timerDisplay);
     function actionButton(label, cls, disabled, onClick) {
       const b = doc.createElement('button');
       b.className = 'btn ' + cls;
@@ -111,7 +115,11 @@
     }
     actions.appendChild(actionButton('打乱', 'btn-func', true, null));
     actions.appendChild(actionButton('求解', 'btn-func', true, null));
-    actions.appendChild(actionButton('计时开始/停止', 'btn-func', true, null));
+    actions.appendChild(actionButton('计时开始/停止', 'btn-func', false, function () {
+      if (callbacks.onTimer) {
+        callbacks.onTimer();
+      }
+    }));
     actions.appendChild(actionButton('重置', 'btn-func', false, function () {
       callbacks.onReset();
     }));

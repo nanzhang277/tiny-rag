@@ -141,9 +141,19 @@ body {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
+  align-items: center;
   margin-top: 4px;
   padding-top: 10px;
   border-top: 1px solid #3c414d;
+}
+
+/* 计时成绩展示（m:ss.cs，§D5）：等宽数字避免跳动 */
+.timer-display {
+  font-variant-numeric: tabular-nums;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  margin-right: 10px;
 }
 
 .btn-func {
