@@ -1,0 +1,151 @@
+/* 网页版三阶魔方样式（§D3）
+   格距 --cell 由 mount.js 写入（= js/render/transforms.js 的 CELL_PX），单一事实源。 */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: #16181d;
+  color: #e8eaf0;
+  font-family: "PingFang SC", "Microsoft YaHei", "Segoe UI", system-ui, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.page-header {
+  text-align: center;
+  margin: 18px 0 4px;
+}
+
+.page-header h1 {
+  font-size: 22px;
+  margin: 0 0 6px;
+  letter-spacing: 2px;
+}
+
+.hint {
+  margin: 0;
+  font-size: 12px;
+  color: #9aa0ad;
+}
+
+.stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px 28px;
+}
+
+/* perspective 容器：作用于直接子层 .scene 的 3D 变换 */
+.cube-view {
+  perspective: 1100px;
+}
+
+/* 视角旋转层：固定视角 rotateX(-28deg) rotateY(-34deg)，同时可见 U/F/R 三面；
+   JS（重置视角按钮）会重写此 transform。 */
+.scene {
+  width: 250px;
+  height: 250px;
+  display: grid;
+  place-items: center;
+  transform-style: preserve-3d;
+}
+
+/* 魔方本体：0 尺寸锚点，26 个 cubie 以中心为原点排布 */
+.cube {
+  position: relative;
+  width: 0;
+  height: 0;
+  transform-style: preserve-3d;
+}
+
+.cubie {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--cell);
+  height: var(--cell);
+  margin-left: calc(var(--cell) / -2);
+  margin-top: calc(var(--cell) / -2);
+  background: #0d0d0f; /* 本体塑料色（内面不可见） */
+  transform-style: preserve-3d;
+}
+
+.sticker {
+  position: absolute;
+  inset: 0;
+  border-radius: 12%;
+  border: 2px solid rgba(0, 0, 0, 0.35);
+  backface-visibility: hidden;
+}
+
+/* ---------- 按钮键盘 ---------- */
+
+.btn-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.btn-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.face-swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  flex: none;
+}
+
+.face-label {
+  width: 44px;
+  font-size: 13px;
+  color: #c3c8d4;
+}
+
+.btn {
+  min-width: 46px;
+  padding: 7px 12px;
+  font-size: 14px;
+  color: #e8eaf0;
+  background: #2a2e37;
+  border: 1px solid #3c414d;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn:hover:not(:disabled) {
+  background: #363b46;
+}
+
+.btn:active:not(:disabled) {
+  background: #454b58;
+}
+
+.btn:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+}
+
+.btn-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+  padding-top: 10px;
+  border-top: 1px solid #3c414d;
+}
+
+.btn-func {
+  min-width: 88px;
+}

@@ -12,7 +12,8 @@
   const holder = { cube: Rubik.Cube.solved() };
   let generation = 0; // 重置时递增，使进行中的动画放弃提交过期状态
 
-  const viewEl = global.document.querySelector('.cube-view');
+  // 视角旋转设在 .scene 上（perspective 作用于其直接子层，见 css/style.css）
+  const viewEl = global.document.querySelector('.scene');
   viewEl.style.transform = DEFAULT_VIEW;
 
   const cubeView = Rubik.mountCube(global.document.querySelector('.scene'));

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>网页版三阶魔方</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="page-header">
+    <h1>网页版三阶魔方</h1>
+    <p class="hint">纯前端实现：CSS 3D 可视化 · Singmaster 记号 · 顺时针 = 从该面外侧看</p>
+  </header>
+
+  <main class="stage">
+    <!-- perspective 容器 → 视角旋转层(.scene) → .cube -->
+    <div class="cube-view">
+      <div class="scene"></div>
+    </div>
+    <div class="panel"></div>
+  </main>
+
+  <!-- 经典 script 标签（非 ES module，规避 file:// CORS）；顺序即依赖顺序 -->
+  <script src="js/core/notation.js"></script>
+  <script src="js/core/cube.js"></script>
+  <script src="js/core/moves.js"></script>
+  <script src="js/core/invariants.js"></script>
+  <script src="js/render/transforms.js"></script>
+  <script src="js/render/animate.js"></script>
+  <script src="js/render/mount.js"></script>
+  <script src="js/ui/buttons.js"></script>
+  <script src="js/ui/app.js"></script>
+</body>
+</html>
