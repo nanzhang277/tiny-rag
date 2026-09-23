@@ -41,3 +41,9 @@ test('applyMove 拒绝非法 move', () => {
   assert.throws(() => applyMove(Cube.solved(), 'X'), Error);
   assert.throws(() => applyMove(Cube.solved(), 'u'), Error);
 });
+
+test('applyMove 仅接受单个 move token（💡3：多 token 不得静默截断）', () => {
+  assert.throws(() => applyMove(Cube.solved(), 'U R'), Error);
+  assert.throws(() => applyMove(Cube.solved(), 'U R F'), Error);
+  assert.throws(() => applyMove(Cube.solved(), ''), Error);
+});

@@ -60,6 +60,7 @@ rubiks-cube/
   js/render/
     transforms.js       渲染纯函数 computeTransforms + 配色/亮度常量
     animate.js          rAF 逐帧进度驱动（不用 CSS transition matrix 插值）
+                        + 代际守卫动画执行器 createGuardedAnimator（重置后过期帧不渲染/不提交）
     mount.js            DOM 装配薄层：26 cubie × 6 sticker，仅写入 transform
   js/ui/
     buttons.js          12 面转按钮面板 + FIFO 输入队列（createMoveQueue 可测）

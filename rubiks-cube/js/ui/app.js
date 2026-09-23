@@ -24,21 +24,24 @@
     cubeView.render(holder.cube);
   }
 
+  // 动画执行器：代际守卫 + 提交时序收敛于此（可注入假 rAF 测试，见 tests/animate-guard.test.js）
+  const animator = Rubik.createGuardedAnimator({
+    getGeneration: function () {
+      return generation;
+    },
+    animateProgress: Rubik.animateProgress,
+    renderFrame: function (move, t) {
+      cubeView.render(holder.cube, move, t);
+    },
+    renderCurrent: function () {
+      cubeView.render(holder.cube);
+    },
+    commit: commit,
+  });
+
   const queue = Rubik.createMoveQueue({
     execute(move, done) {
-      const gen = generation;
-      Rubik.animateProgress(
-        MOVE_DURATION_MS,
-        function (t) {
-          cubeView.render(holder.cube, move, t);
-        },
-        function () {
-          if (gen === generation) {
-            commit(move);
-          }
-          done();
-        }
-      );
+      animator.run(MOVE_DURATION_MS, move, done);
     },
   });
 

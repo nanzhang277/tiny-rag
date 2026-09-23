@@ -68,9 +68,16 @@
   /**
    * 应用一个 move（如 'U' / "U'" / 'U2'），返回新状态（不修改原状态）。
    * turns = 1 | 2 | 3（' = 3 次幂），由基本表幂次派生。
+   * 仅接受单个 move token；多 token 序列请用 parseMoves 拆分后逐个应用。
    */
   function applyMove(cube, move) {
-    const token = parseMoves(move)[0];
+    const tokens = parseMoves(move);
+    if (tokens.length !== 1) {
+      throw new Error(
+        'applyMove 仅接受单个 move token，收到 ' + tokens.length + ' 个: ' + JSON.stringify(move)
+      );
+    }
+    const token = tokens[0];
     const face = token[0];
     assertBasicFace(face);
     const turns = token.length === 1 ? 1 : token[1] === '2' ? 2 : 3;

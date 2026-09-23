@@ -51,7 +51,6 @@ test('测试1：move² 与自身抵消（幂次派生一致性）', () => {
 });
 
 test('测试3：经典恒等式 (R U R\' U\')^6 = 恒等', () => {
-  const seq = ["R'", 'U', 'R', "U'"].join(' ');
   let cube = Cube.solved();
   for (let i = 0; i < 6; i++) {
     cube = applySeq(cube, ['R', 'U', "R'", "U'"]);
